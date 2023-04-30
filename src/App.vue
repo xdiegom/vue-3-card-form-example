@@ -1,78 +1,45 @@
 <template>
   <div class="w-full min-h-screen items-center justify-center flex">
-    <Card :information="cardCategory"></Card>
+    <div class="space-y-3 mx-10">
+      <Card :information="card"></Card>
+      <CardForm @onChange="setCard"></CardForm>
+    </div>
   </div>
 </template>
 
 <script>
-import Card from './components/Card.vue';
+import { reactive } from "vue";
+import Card from "./components/Card.vue";
+import CardForm from "./components/CardForm.vue";
 
 export default {
   components: {
-    Card
+    Card,
+    CardForm,
   },
-  data() {
-    return {
-      currentCategory: 0,
-      cards: [
-        {
-          name: "Basic",
-          background: "/images/card-bgs/basic.png",
-          cardHolder: {
-            name: 'John Doe'
-          },
-          card: {
-            number: '1234 5457 9832 0329',
-            expires: '03/24'
-          }
-        },
-        {
-          name: "Gold",
-          background: "/images/card-bgs/gold.png",
-          cardHolder: {
-            name: 'Jane Doe'
-          },
-          card: {
-            number: '1234 5457 9832 0415',
-            expires: '04/25'
-          }
-        },
-        {
-          name: "Platinum",
-          background: "/images/card-bgs/platinum.png",
-          cardHolder: {
-            name: 'Marie Doe'
-          },
-          card: {
-            number: '1234 5457 9832 0712',
-            expires: '12/24'
-          }
-        },
-        {
-          name: "Black",
-          background: "/images/card-bgs/black.png",
-          cardHolder: {
-            name: 'Anthony Doe'
-          },
-          card: {
-            number: '1234 5457 9832 2849',
-            expires: '09/24'
-          }
-        },
-      ],
-      cardCategory: null,
-    };
-  },
-  created() {
-    this.cardCategory = this.cards[this.currentCategory];
+  setup() {
+    let currentCard = reactive({
+      name: "Basic",
+      background: "/images/card-bgs/basic.png",
+      cardHolder: {
+        name: "John Doe",
+      },
+      card: {
+        number: "1234 5457 9832 0329",
+        expires: "12/24",
+      },
+    });
 
-    setInterval(() => {
-      this.currentCategory =
-        this.currentCategory + 1 > this.cards.length ? 0 : this.currentCategory;
+    function setCard(event) {
+      const { name, background, cardHolder, card } = event;
+      currentCard.name = name;
+      currentCard.background = background;
+      currentCard.cardHolder.name = cardHolder.name;
+      currentCard.card.number = card.number;
+      currentCard.card.expires = card.expires;
+    }
 
-      this.cardCategory = this.cards[this.currentCategory];
-      this.currentCategory += 1;
-    }, 1000);
+    return { card: currentCard, setCard };
   },
-}
+};
 </script>
