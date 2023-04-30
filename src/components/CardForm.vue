@@ -21,49 +21,53 @@
       <label for="name_on_card" class="text-sm">Name on Card</label>
       <input
         v-model="form.cardName"
+        v-maska:[nameOption]
         class="border rounded border-black p-0.5"
         type="text"
         placeholder="John Doe"
         id="name_on_card"
       />
     </div>
-    <div class="flex flex-col">
-      <label for="card_number" class="text-sm">Card Number</label>
-      <input
-        v-model="form.cardNumber"
-        class="border rounded border-black p-0.5 w-full"
-        placeholder="1234 5678 9101 1121"
-        type="text"
-        id="card_number"
-      />
-    </div>
-    <div class="flex justify-between">
-      <div class="flex flex-col">
+    <div class="flex space-x-6">
+      <div class="flex flex-col w-2/3">
+        <label for="card_number" class="text-sm">Card Number</label>
+        <input
+          v-model="form.cardNumber"
+          v-maska
+          data-maska="#### #### #### ####"
+          class="border rounded border-black p-0.5 w-full"
+          placeholder="1234 5678 9101 1121"
+          type="text"
+          id="card_number"
+        />
+      </div>
+      <div class="flex flex-col w-1/3">
         <label for="expiration" class="text-sm">Expiration</label>
         <div class="flex space-x-1">
-          <input
-            v-model="form.cardMonth"
-            class="border rounded w-32 border-black p-0.5"
-            type="text"
-            id="month"
-          />
-          <input
-            v-model="form.cardYear"
-            class="border rounded w-32 border-black p-0.5"
-            type="text"
+          <select
+            class="border rounded border-black p-0.5"
+            name="year"
             id="year"
-          />
-        </div>
-      </div>
-      <div class="flex flex-col">
-        <label for="cvc" class="text-sm">CVC</label>
-        <div class="flex space-x-1">
-          <input
-            v-model="form.cardCVC"
-            class="border rounded w-16 border-black p-0.5"
-            type="text"
-            id="cvc"
-          />
+            v-model="form.cardMonth"
+          >
+            <option v-for="month in 12" :key="month" :value="month">
+              {{ month }}
+            </option>
+          </select>
+          <select
+            class="border rounded border-black p-0.5"
+            name="year"
+            id="year"
+            v-model="form.cardYear"
+          >
+            <option
+              v-for="(year, index) in 4"
+              :key="year"
+              :value="new Date().getFullYear() + index"
+            >
+              {{ new Date().getFullYear() + index }}
+            </option>
+          </select>
         </div>
       </div>
     </div>
@@ -72,17 +76,21 @@
 
 <script>
 import { computed, reactive, ref, watch } from "vue";
+import { vMaska } from "maska";
+
 export default {
+  directives: {
+    maska: vMaska,
+  },
   setup(props, context) {
     const form = reactive({
       cardName: "John Doe",
       cardNumber: "1234 5457 9832 0329",
       cardType: "basic",
       cardMonth: "12",
-      cardYear: "24",
-      cardCVC: "123",
+      cardYear: new Date().getFullYear(),
     });
-    const selectedCategory = ref('basic');
+    const selectedCategory = ref("basic");
 
     const cardCategories = ref([
       {
@@ -108,6 +116,9 @@ export default {
         (value) => value.code === selectedCategory?.value
       );
 
+      const cardMonth =
+        form.cardMonth <= 9 ? "0" + form.cardMonth : form.cardMonth;
+
       return {
         name: cardCategory?.name,
         background: `/images/card-bgs/${cardCategory?.code}.png`,
@@ -116,7 +127,7 @@ export default {
         },
         card: {
           number: form.cardNumber,
-          expires: form.cardMonth + "/" + form.cardYear,
+          expires: cardMonth + "/" + form.cardYear,
         },
       };
     });
@@ -128,12 +139,18 @@ export default {
       }
     );
 
+    const nameOption = reactive({
+      postProcess: (value) => value.slice(0, 28)
+    })
+
     return {
       selectedCategory,
       form,
       cardCategories,
 
       cardInformation,
+
+      nameOption
     };
   },
 };

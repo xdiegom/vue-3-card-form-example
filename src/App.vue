@@ -26,7 +26,7 @@ export default {
       },
       card: {
         number: "1234 5457 9832 0329",
-        expires: "12/24",
+        expires: "12/" + new Date().getFullYear(),
       },
     });
 
