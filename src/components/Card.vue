@@ -82,12 +82,10 @@
         </svg>
       </div>
       <div class="font-bold tracking-wide -mt-3 text-[19px]">
-        {{ information.card.number }}
+        {{ cardNumber }}
       </div>
       <div class="flex justify-between">
-        <span class="text-xs uppercase tracking-wider">{{
-          information.cardHolder.name
-        }}</span>
+        <span class="text-xs uppercase tracking-wider">{{ cardName }}</span>
         <span class="text-xs">{{ information.card.expires }}</span>
       </div>
     </div>
@@ -95,12 +93,34 @@
 </template>
 
 <script>
+import { computed } from "vue";
 export default {
   props: {
     information: {
       type: Object,
       required: true,
     },
+  },
+  setup(props) {
+    const cardName = computed(() => {
+      const name = props.information.cardHolder.name;
+      if (name.length > 0) {
+        return name;
+      }
+
+      return "ENTER NAME";
+    });
+
+    const cardNumber = computed(() => {
+      const number = props.information.card.number;
+      if (number.length > 0) {
+        return number;
+      }
+
+      return "ENTER NUMBER";
+    });
+
+    return { cardName, cardNumber };
   },
 };
 </script>
